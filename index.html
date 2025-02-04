@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Penalty Shootout Soccer Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f0f0;
+        }
+        #gameCanvas {
+            background-color: #009900;
+            display: block;
+            margin: 0 auto;
+            border: 2px solid black;
+        }
+        h1 {
+            color: #333;
+        }
+        #score {
+            font-size: 20px;
+            margin-top: 20px;
+        }
+        #reset {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #ffcc00;
+            border: none;
+            cursor: pointer;
+        }
+        #reset:hover {
+            background-color: #ffaa00;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Penalty Shootout Soccer Game</h1>
+    <canvas id="gameCanvas" width="600" height="400"></canvas>
+    <div id="score">Score: 0</div>
+    <button id="reset">Play Again</button>
+
+    <script>
+        // Setting up the canvas and context
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        // Game variables
+        let score = 0;
+        let ballX = 100, ballY = 200, ballRadius = 10;
+        let isShooting = false;
+        let shootDirection = { x: 0, y: 0 };
+        let goalkeeperX = 500, goalkeeperY = 180;
+        let goalkeeperSpeed = 2;
+
+        // Drawing the ball
+        function drawBall() {
+            ctx.beginPath();
+            ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
+            ctx.fillStyle = "#FF0000";
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        // Drawing the goalkeeper
+        function drawGoalkeeper() {
+            ctx.beginPath();
+            ctx.rect(goalkeeperX, goalkeeperY, 20, 40);
+            ctx.fillStyle = "#0000FF";
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        // Drawing the game elements (goal, score)
+        function drawGame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+            drawBall();
+            drawGoalkeeper();
+            ctx.font = "16px Arial";
+            ctx.fillStyle = "#FFFFFF";
+            ctx.fillText("Score: " + score, 10, 20);
+
+            // Ball movement
+            if (isShooting) {
+                ballX += shootDirection.x;
+                ballY += shootDirection.y;
+
+                // If the ball hits the goal
+                if (ballX > 580 && ballY > goalkeeperY && ballY < goalkeeperY + 40) {
+                    score++;
+                    resetBall();
+                }
+
+                // If the ball goes off the screen
+                if (ballX > canvas.width || ballX < 0 || ballY < 0 || ballY > canvas.height) {
+                    resetBall();
+                }
+            }
+
+            // Goalkeeper movement (simple left-right bouncing)
+            goalkeeperY += Math.random() > 0.5 ? goalkeeperSpeed : -goalkeeperSpeed;
+            if (goalkeeperY < 0) goalkeeperY = 0;
+            if (goalkeeperY > canvas.height - 40) goalkeeperY = canvas.height - 40;
+        }
+
+        // Reset ball to the starting position
+        function resetBall() {
+            ballX = 100;
+            ballY = 200;
+            isShooting = false;
+            shootDirection = { x: 0, y: 0 };
+        }
+
+        // Handle mouse click to shoot the ball
+        canvas.addEventListener("click", (e) => {
+            if (!isShooting) {
+                const mouseX = e.offsetX;
+                const mouseY = e.offsetY;
+                shootDirection.x = (mouseX - ballX) / 10;
+                shootDirection.y = (mouseY - ballY) / 10;
+                isShooting = true;
+            }
+        });
+
+        // Reset game when "Play Again" is clicked
+        document.getElementById(
