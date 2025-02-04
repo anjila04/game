@@ -125,4 +125,21 @@
         });
 
         // Reset game when "Play Again" is clicked
-        document.getElementById(
+        document.getElementById("reset").addEventListener("click", () => {
+            score = 0;
+            resetBall();
+            goalkeeperY = 180; // Reset goalkeeper position
+        });
+
+        // Update game in intervals
+        function gameLoop() {
+            drawGame();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Start the game loop
+        gameLoop();
+    </script>
+
+</body>
+</html>
